@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jogo da Memória</title>
+  <link rel="icon" href="icon/Memoria.icon" type="icon/Memoria.icon">
+  <style>
+    body {
+      background-image: url(imagens/ia.png) ;
+      font-family: 'Arial', sans-serif;
+      
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+      text-align: center;
+      background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
+      background-repeat: no-repeat; /* Não repete a imagem */
+      background-position: center; /* Centraliza a imagem */
+      min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
+      margin: 0; /* Remove a margem padrão do body */
+    }
+
+    h2 {
+      color: #0c0c0d;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+
+    p {
+      font-size: 18px;
+      color: #0c0c0d;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #phase-info, #congrats {
+      margin-top: 20px;
+    }
+
+    #game-board {
+      display: grid;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+      transition: all 0.5s ease;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #555;
+      cursor: pointer;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+      border-radius: 10px;
+    }
+
+    .card.flipped img {
+      display: block;
+    }
+
+    video {
+      margin-top: 20px;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    button {
+      padding: 12px 30px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #startGame {
+      margin-top: 30px;
+      font-size: 20px;
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .nav-buttons button {
+      margin: 10px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      h2 {
+        font-size: 1.6em;
+      }
+
+      #game-board {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+      }
+
+      .card {
+        width: 90px;
+        height: 90px;
+      }
+
+      video {
+        width: 90%;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.4em;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      #game-board {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+      }
+
+      .card {
+        width: 80px;
+        height: 80px;
+      }
+
+      video {
+        width: 85%;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 8px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Jogo da Memória com Fases</h2>
+ 
+  <button id="startGame">Iniciar Jogo</button>
+
+  <div id="phase-info" class="hidden">
+    <h2 id="phase-title">Fase 1</h2>
+  </div>
+
+  <div id="game-board" class="hidden"></div>
+
+  <div id="congrats" class="hidden">
+    <h2>🎉 Parabéns! Você completou o jogo! 🎉</h2>
+    <video id="end-video" controls autoplay>
+      <source src="videos/video.mp4" type="video/mp4">
+      Seu navegador não suporta vídeos.
+    </video>
+  </div>
+
+  <div id="nav-buttons" class="nav-buttons">
+    <button onclick="window.location.href='index.html'">Início</button>
+    <button onclick="window.location.href='Pacmam.html'">Jogo 1</button>
+  </div>
+
+  <script>
+    // ✅ DEFINA SUAS IMAGENS AQUI (no máximo 8 imagens diferentes)
+    const imagePaths = [
+      "imagens/img1.jpg",
+      "imagens/img2.jpg",
+      "imagens/img3.jpg",
+      "imagens/img4.jpg",
+      "imagens/img5.jpg",
+      "imagens/img6.jpg",
+      "imagens/img7.jpg",
+      "imagens/img8.jpg"
+    ];
+
+    const startBtn = document.getElementById("startGame");
+    const gameBoard = document.getElementById("game-board");
+    const phaseTitle = document.getElementById("phase-title");
+    const phaseInfo = document.getElementById("phase-info");
+    const congrats = document.getElementById("congrats");
+    const endVideo = document.getElementById("end-video");
+
+    const navButtons = document.getElementById("nav-buttons");
+
+    let phase = 1;
+    let flippedCards = [];
+    let lockBoard = false;
+    let matchedPairs = 0;
+
+    const phasePairs = {
+      1: 4,
+      2: 6,
+      3: 8,
+    };
+
+    startBtn.addEventListener("click", () => {
+      phase = 1;
+      phaseInfo.classList.remove("hidden");
+      startBtn.classList.add("hidden");
+      startPhase();
+    });
+
+    function startPhase() {
+      matchedPairs = 0;
+      flippedCards = [];
+      lockBoard = false;
+      phaseTitle.textContent = `Fase ${phase}`;
+      gameBoard.classList.remove("hidden");
+      gameBoard.classList.add("show");
+
+      const pairs = phasePairs[phase];
+      const selectedImages = imagePaths.slice(0, pairs);
+      const cards = [...selectedImages, ...selectedImages].map((src) => ({
+        id: Math.random(),
+        src,
+      }));
+
+      shuffle(cards);
+      renderBoard(cards);
+    }
+
+    function renderBoard(cards) {
+      gameBoard.innerHTML = "";
+      const cols = Math.ceil(Math.sqrt(cards.length));
+      gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+      cards.forEach((card) => {
+        const cardElement = document.createElement("div");
+        cardElement.classList.add("card");
+        cardElement.dataset.id = card.id;
+
+        const img = document.createElement("img");
+        img.src = card.src;
+
+        cardElement.appendChild(img);
+        gameBoard.appendChild(cardElement);
+
+        cardElement.addEventListener("click", () => handleCardClick(cardElement, card.src));
+      });
+    }
+
+    function handleCardClick(cardElement, src) {
+      if (lockBoard || cardElement.classList.contains("flipped")) return;
+
+      cardElement.classList.add("flipped");
+      flippedCards.push({ element: cardElement, src });
+
+      if (flippedCards.length === 2) {
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      const [first, second] = flippedCards;
+      if (first.src === second.src) {
+        matchedPairs++;
+        flippedCards = [];
+
+        if (matchedPairs === phasePairs[phase]) {
+          setTimeout(() => {
+            if (phase < 3) {
+              phase++;
+              startPhase();
+            } else {
+              showCongratulations();
+            }
+          }, 1000);
+        }
+      } else {
+        lockBoard = true;
+        setTimeout(() => {
+          first.element.classList.remove("flipped");
+          second.element.classList.remove("flipped");
+          flippedCards = [];
+          lockBoard = false;
+        }, 1000);
+      }
+    }
+
+    function showCongratulations() {
+      gameBoard.classList.add("hidden");
+      phaseInfo.classList.add("hidden");
+      congrats.classList.remove("hidden");
+      endVideo.play();
+    }
+
+    function shuffle(array) {
+      array.sort(() => Math.random() - 0.5);
+    }
+  </script>
+
+</body>
+</html>

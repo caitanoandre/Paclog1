@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="icon/ia.icon" type="image/x-icon">
+  <title>Escolha seu Jogo</title>
+  <style>
+    body {
+      background-image: url(imagens/ia.png) ;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
+      background-repeat: no-repeat; /* Não repete a imagem */
+      background-position: center; /* Centraliza a imagem */
+      min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
+      margin: 0; /* Remove a margem padrão do body */
+        
+    }
+
+    video {
+      width: 80%;
+      max-width: 600px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .button-container {
+      margin-top: 20px;
+      display: none; /* esconde os botões no início */
+    }
+
+    button {
+      margin: 0 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <video id="introVideo" controls>
+    <source src="videos/202503132104.mp4" type="video/mp4">
+    Seu navegador não suporta vídeos.
+  </video>
+
+  <div id="buttons" class="button-container">
+    <button onclick="window.location.href='Pacmam.html'">Jogo 1</button>
+    <button onclick="window.location.href='Memoria.html'">Jogo 2</button>
+  </div>
+
+  <script>
+    const video = document.getElementById("introVideo");
+    const buttons = document.getElementById("buttons");
+
+    video.addEventListener("ended", () => {
+      buttons.style.display = "block";
+    });
+  </script>
+
+</body>
+</html>

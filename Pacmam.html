@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Pac-Man Entregador </title>
+  <link rel="icon" href="icon/pacLog.icon" type="image/x-icon">
+  <style>
+    body {
+      background-image: url(imagens/jogo.jpg);
+      margin: 0;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      padding-top: 20px;
+      background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
+      background-repeat: no-repeat; /* Não repete a imagem */
+      background-position: center; /* Centraliza a imagem */
+      min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
+      margin: 0; /* Remove a margem padrão do body */
+        
+    }
+
+    #score {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    canvas {
+      background: #222;
+      border: 2px solid white;
+    }
+
+    #controls {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    #controls button {
+      font-size: 24px;
+      margin: 5px;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      background: #333;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #controls button:hover {
+      background: #555;
+    }
+    
+
+    button {
+      margin: 0 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Caixas coletadas: 0</div>
+  <canvas id="game" width="600" height="400"></canvas>
+
+  <!-- Controles de direção -->
+  <div id="controls">
+    <button data-dir="ArrowUp">⬆️</button><br>
+    <button data-dir="ArrowLeft">⬅️</button>
+    <button data-dir="ArrowDown">⬇️</button>
+    <button data-dir="ArrowRight">➡️</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreText = document.getElementById("score");
+
+    const tileSize = 20;
+    const cols = canvas.width / tileSize;
+    const rows = canvas.height / tileSize;
+
+    const map = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1],
+      [1,0,1,1,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,1],
+      [1,0,1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1],
+      [1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1],
+      [1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1],
+      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1],
+      [1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,1],
+      [1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1],
+      [1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1],
+      [1,0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1],
+      [1,0,1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1],
+      [1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ];
+
+    let truck = { x: 1, y: 1 };
+    let direction = { dx: 0, dy: 0 };
+    let score = 0;
+    let boxes = [];
+
+    let clients = [
+      { x: 28, y: 1, type: 'chaser' },
+      { x: 28, y: 18, type: 'ambusher' },
+      { x: 1, y: 18, type: 'random' },
+      { x: 15, y: 10, type: 'patrol', step: 0 }
+    ];
+
+    function isFree(x, y) {
+      return map[y] && map[y][x] === 0;
+    }
+
+    function createBoxes() {
+      boxes = [];
+      for (let y = 1; y < rows - 1; y++) {
+        for (let x = 1; x < cols - 1; x++) {
+          if (map[y][x] === 0 && Math.random() < 0.1 && !(x === truck.x && y === truck.y)) {
+            boxes.push({ x, y });
+          }
+        }
+      }
+    }
+
+    function drawTile(x, y, emoji) {
+      ctx.font = "16px sans-serif";
+      ctx.fillText(emoji, x * tileSize + 2, y * tileSize + 16);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          if (map[y][x] === 1) {
+            ctx.fillStyle = "#444";
+            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+          }
+        }
+      }
+
+      boxes.forEach(b => drawTile(b.x, b.y, "📦"));
+      clients.forEach(c => drawTile(c.x, c.y, "😠"));
+      drawTile(truck.x, truck.y, "🚚");
+    }
+
+    function moveTruck() {
+      const newX = truck.x + direction.dx;
+      const newY = truck.y + direction.dy;
+
+      if (isFree(newX, newY)) {
+        truck.x = newX;
+        truck.y = newY;
+      }
+
+      direction = { dx: 0, dy: 0 }; // faz o caminhão andar 1 passo por clique
+
+      boxes = boxes.filter(b => {
+        if (b.x === truck.x && b.y === truck.y) {
+          score++;
+          scoreText.textContent = "Caixas coletadas: " + score;
+          return false;
+        }
+        return true;
+      });
+
+      if (clients.some(c => c.x === truck.x && c.y === truck.y)) {
+        alert("Você foi pego por um cliente Insatisfeito! 😠");
+        resetGame();
+      }
+
+      if (boxes.length === 0) {
+        alert("Parabéns! Você coletou todas as caixas! 🏆");
+        resetGame();
+      }
+    }
+
+    function moveClients() {
+      clients.forEach(c => {
+        let dx = 0, dy = 0;
+        switch (c.type) {
+          case 'chaser':
+            dx = Math.sign(truck.x - c.x);
+            dy = Math.sign(truck.y - c.y);
+            break;
+          case 'ambusher':
+            dx = Math.sign((truck.x + direction.dx * 2) - c.x);
+            dy = Math.sign((truck.y + direction.dy * 2) - c.y);
+            break;
+          case 'random':
+            const dirs = [
+              { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+              { dx: 0, dy: 1 }, { dx: 0, dy: -1 }
+            ];
+            const valid = dirs.filter(d => isFree(c.x + d.dx, c.y + d.dy));
+            if (valid.length > 0) {
+              const rand = valid[Math.floor(Math.random() * valid.length)];
+              dx = rand.dx;
+              dy = rand.dy;
+            }
+            break;
+          case 'patrol':
+            const path = [
+              { dx: 1, dy: 0 }, { dx: 0, dy: 1 },
+              { dx: -1, dy: 0 }, { dx: 0, dy: -1 }
+            ];
+            const move = path[c.step % path.length];
+            if (isFree(c.x + move.dx, c.y + move.dy)) {
+              dx = move.dx;
+              dy = move.dy;
+              c.step++;
+            }
+            break;
+        }
+
+        const newX = c.x + dx;
+        const newY = c.y + dy;
+        if (isFree(newX, newY)) {
+          c.x = newX;
+          c.y = newY;
+        }
+      });
+    }
+
+    document.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "ArrowUp": direction = { dx: 0, dy: -1 }; break;
+        case "ArrowDown": direction = { dx: 0, dy: 1 }; break;
+        case "ArrowLeft": direction = { dx: -1, dy: 0 }; break;
+        case "ArrowRight": direction = { dx: 1, dy: 0 }; break;
+      }
+    });
+
+    // Controles por clique
+    document.querySelectorAll("#controls button").forEach(button => {
+      button.addEventListener("click", () => {
+        const key = button.getAttribute("data-dir");
+        const event = new KeyboardEvent("keydown", { key });
+        document.dispatchEvent(event);
+      });
+    });
+
+    function resetGame() {
+      truck = { x: 1, y: 1 };
+      direction = { dx: 0, dy: 0 };
+      score = 0;
+      scoreText.textContent = "Caixas coletadas: 0";
+      clients = [
+        { x: 28, y: 1, type: 'chaser' },
+        { x: 28, y: 18, type: 'ambusher' },
+        { x: 1, y: 18, type: 'random' },
+        { x: 15, y: 10, type: 'patrol', step: 0 }
+      ];
+      createBoxes();
+    }
+
+    function gameLoop() {
+      moveTruck();
+      moveClients();
+      draw();
+      setTimeout(gameLoop, 200);
+    }
+
+    resetGame();
+    gameLoop();
+  </script>
+
+<div id="buttons" class="button-container">
+  <button onclick="window.location.href='index.html'">Inicio</button>
+  <button onclick="window.location.href='Memoria.html'">Jogo 2</button>
+</div>
+</body>
+</html>
