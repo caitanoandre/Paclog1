@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcardeClass</title>
+    <link rel="icon" href="icon/play.icon" type="image/x-icon">
+
+    <!-- Incluindo apenas uma versão do Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style2.css">
+
+    <style>
+        /* Adicionando imagem de fundo */
+        body {
+            background-image: url('imagens/vid.png'); /* Substitua 'sua-imagem.jpg' pelo caminho da sua imagem */
+            background-size: cover; /* A imagem cobre toda a tela */
+            background-position: center; /* A imagem ficará centralizada */
+            background-attachment: fixed; /* A imagem ficará fixa enquanto rola a página */
+            color: white; /* Para melhorar a legibilidade do texto no fundo */
+        }
+
+        /* Estilizando o nav e os botões */
+        #nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px; /* Distância do topo */
+        }
+
+        #nav-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Adicionando espaçamento entre o nav e os vídeos */
+        main {
+            margin-top: 50px; /* Distância entre o nav e os vídeos */
+        }
+
+        /* Estilo para o container de vídeos, se necessário */
+        .cards {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px; /* Distância adicional para os vídeos */
+        }
+
+        /* Estilizando os vídeos */
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Estilo para novos cards */
+        .new-card {
+            border: 2px solid #fff;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+    </style>
+    
+    <link rel="shortcut icon">
+</head>
+
+<body>
+    <div id="nav-buttons" class="nav-buttons">
+        <button onclick="window.location.href='index.html'">Início</button>
+        <button onclick="window.location.href='Pacmam.html'">PacLog</button>
+        <button onclick="window.location.href='Memoria.html'">Memoria</button>
+        <button onclick="window.location.href='Fotos.html'">Fotos</button>
+    </div>
+    
+    <main>
+        <div class="container">
+            <input type="radio" name="slider" id="item-1" checked>
+            <input type="radio" name="slider" id="item-2">
+            <input type="radio" name="slider" id="item-3">
+            <input type="radio" name="slider" id="item-4">
+            
+            <div class="cards" id="cards-container">
+                <label class="card" for="item-1" id="song-1">
+                    <video id="video-1" controls>
+                        <source src="videos/1.mp4" type="video/mp4">
+                    </video>
+                </label>
+
+                <label class="card" for="item-2" id="song-2">
+                    <video id="video-2" controls>
+                        <source src="videos/2.mp4" type="video/mp4">
+                    </video> 
+                </label>
+
+                <label class="card" for="item-3" id="song-3">
+                    <video id="video-3" controls>
+                        <source src="videos/3.mp4" type="video/mp4">
+                    </video>
+                </label>
+                
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Função para pausar todos os vídeos
+        function pauseAllVideos() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => video.pause());
+        }
+
+        // Função para adicionar um novo card após o fim de um vídeo
+        function addNewCard(videoId) {
+            // Criar o novo card
+            var newCard = document.createElement("label");
+            newCard.classList.add("card", "new-card");
+            newCard.innerHTML = `
+                <video controls>
+                    <source src="videos/novo_video.mp4" type="video/mp4">
+                </video>
+                <p>Card Adicionado</p>
+            `;
+
+            // Adicionar o novo card ao container de cards
+            var container = document.getElementById("cards-container");
+            container.appendChild(newCard);
+
+            // Pausar todos os vídeos
+            pauseAllVideos();
+        }
+
+        // Monitorar o fim dos vídeos e adicionar um card
+        document.getElementById("video-1").addEventListener('ended', function() {
+            addNewCard("video-1");
+        });
+
+        document.getElementById("video-2").addEventListener('ended', function() {
+            addNewCard("video-2");
+        });
+
+        document.getElementById("video-3").addEventListener('ended', function() {
+            addNewCard("video-3");
+        });
+    </script>
+</body>
+</html>

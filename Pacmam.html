@@ -2,48 +2,64 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Pac-Man Entregador </title>
+  <title>Pac-Man Entregador</title>
   <link rel="icon" href="icon/pacLog.icon" type="image/x-icon">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background-image: url(imagens/jogo.jpg);
       margin: 0;
-      color: white;
       font-family: sans-serif;
+      background-image: url('imagens/jogo.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       height: 100vh;
-      padding-top: 20px;
-      background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
-      background-repeat: no-repeat; /* Não repete a imagem */
-      background-position: center; /* Centraliza a imagem */
-      min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
-      margin: 0; /* Remove a margem padrão do body */
-        
+      color: white;
+    }
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     #score {
-      font-size: 20px;
+      font-size: 24px;
       margin-bottom: 10px;
+      text-align: center;
     }
 
     canvas {
       background: #222;
-      border: 2px solid white;
+      border: 3px solid white;
     }
 
     #controls {
-      margin-top: 15px;
-      text-align: center;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control-row {
+      display: flex;
+      gap: 20px;
     }
 
     #controls button {
-      font-size: 24px;
-      margin: 5px;
-      padding: 10px 15px;
-      border-radius: 10px;
+      font-size: 36px;
+      padding: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
       border: none;
       background: #333;
       color: white;
@@ -54,35 +70,51 @@
     #controls button:hover {
       background: #555;
     }
-    
 
-    button {
+    #buttons {
+      margin-top: 20px;
+    }
+
+    #buttons button {
       margin: 0 10px;
-      padding: 12px 24px;
+      padding: 14px 28px;
       font-size: 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background-color: #007bff;
       color: white;
       cursor: pointer;
       transition: background 0.3s;
     }
 
-    button:hover {
+    #buttons button:hover {
       background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div id="score">Caixas coletadas: 0</div>
-  <canvas id="game" width="600" height="400"></canvas>
+  <div id="container">
+    <div id="score">Caixas coletadas: 0</div>
+    <canvas id="game" width="600" height="400"></canvas>
 
-  <!-- Controles de direção -->
-  <div id="controls">
-    <button data-dir="ArrowUp">⬆️</button><br>
-    <button data-dir="ArrowLeft">⬅️</button>
-    <button data-dir="ArrowDown">⬇️</button>
-    <button data-dir="ArrowRight">➡️</button>
+    <!-- Controles de direção -->
+    <div id="controls">
+      <div class="control-row">
+        <button data-dir="ArrowUp">⬆️</button>
+      </div>
+      <div class="control-row">
+        <button data-dir="ArrowLeft">⬅️</button>
+        <button data-dir="ArrowDown">⬇️</button>
+        <button data-dir="ArrowRight">➡️</button>
+      </div>
+    </div>
+
+    <div id="buttons">
+      <button onclick="window.location.href='index.html'">Início</button>
+      <button onclick="window.location.href='Memoria.html'">Memoria</button>
+      <button onclick="window.location.href='Videos.html'">Videos</button>
+    <button onclick="window.location.href='Fotos.html'">Fotos</button>
+    </div>
   </div>
 
   <script>
@@ -174,7 +206,7 @@
         truck.y = newY;
       }
 
-      direction = { dx: 0, dy: 0 }; // faz o caminhão andar 1 passo por clique
+      direction = { dx: 0, dy: 0 };
 
       boxes = boxes.filter(b => {
         if (b.x === truck.x && b.y === truck.y) {
@@ -252,7 +284,7 @@
       }
     });
 
-    // Controles por clique
+    // Controles por toque
     document.querySelectorAll("#controls button").forEach(button => {
       button.addEventListener("click", () => {
         const key = button.getAttribute("data-dir");
@@ -285,10 +317,5 @@
     resetGame();
     gameLoop();
   </script>
-
-<div id="buttons" class="button-container">
-  <button onclick="window.location.href='index.html'">Inicio</button>
-  <button onclick="window.location.href='Memoria.html'">Jogo 2</button>
-</div>
 </body>
 </html>
